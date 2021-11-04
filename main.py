@@ -18,7 +18,6 @@ class App:
         drawer(self.screen)
         pygame.display.flip()
 
-
     def run(self):
         while True:
             self.update()
@@ -26,7 +25,6 @@ class App:
             [exit() for i in pygame.event.get() if i.type == pygame.QUIT]
             self.clock.tick(self.fps)
             pygame.display.set_caption(f'FPS: {self.clock.get_fps()}')
-
 
 
 if __name__ == '__main__':

@@ -1,6 +1,8 @@
-from settings import *
-from numpy import array
 import math
+from numpy import array
+
+from settings import *
+from generate_random_lines import generate_random_lines
 
 
 def distance(x1, y1, x2, y2):
@@ -53,7 +55,7 @@ def raycast(ray_point, angle, lines):
 def main():
     cords = array([0, 0])
     angle = 0
-    lines = generate_lines(10)
+    lines = generate_random_lines(10)
     lines = [(array([-2, 2]), array([2, 2]))]
     sp = raycast(cords, angle, lines)
     print(sp)

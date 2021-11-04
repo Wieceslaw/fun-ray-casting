@@ -1,36 +1,23 @@
 import pygame
-from settings import *
-from test import *
 from numpy import array
-from random import random
 
-def generate_lines(n):
-    return [(array((random() * SIZE[0], random() * SIZE[1])), array((random() * SIZE[0], random() * SIZE[1]))) for _ in range(n)]
+from settings import *
+from raycasting import *
+from generate_random_lines import generate_random_lines
 
 cords = array([400, 300])
-lines = generate_lines(100)
-
+lines = generate_random_lines(NLINES)
 
 def drawer(sc):
     pygame.draw.circle(sc, GREEN, cords, 12)
-    ray = array((math.cos(math.pi * angle / 180), math.sin(math.pi * angle / 180)))
-    min_dist = 10000
-    collieded = False
     for line in lines:
         pygame.draw.line(sc, GREEN, *line)
-        t = intersects(cords, *line, ray)
-        if t is not None:
-            new_dist = distance(*cords, *t)
-            if new_dist < min_dist:
-                min_dist = new_dist
-                point = t
-            collieded = True
-    if collieded:
-        color = RED
-    else:        
-        point = cords + ray * 10000
-        color = GREEN
-    pygame.draw.line(sc, color, cords, point)
+    collision_points = raycast(cords, angle, lines)
+    for collided, point in collision_points:
+        if collided:
+            pygame.draw.line(sc, RED, cords, point)
+        else:
+            pygame.draw.line(sc, BLUE, cords, point)
 
 
 angle = 0
