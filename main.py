@@ -14,7 +14,7 @@ class App:
         keys()
 
     def draw(self): 
-        self.screen.fill(BLACK)
+        self.screen.fill(BG_COLOR)
         drawer(self.screen)
         pygame.display.flip()
 

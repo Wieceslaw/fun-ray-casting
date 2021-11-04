@@ -7,12 +7,16 @@ from generate_random_lines import generate_random_lines
 
 cords = array([400, 300])
 lines = generate_random_lines(NLINES)
+angle = 0
+
 
 def drawer(sc):
     pygame.draw.circle(sc, GREEN, cords, 12)
-    for line in lines:
+    lines_in_fov = visible_lines(lines, cords, (angle - FOV // 2, angle + FOV // 2))
+    for line in lines_in_fov:
         pygame.draw.line(sc, GREEN, *line)
-    collision_points = raycast(cords, angle, lines)
+    collision_points = raycast(cords, angle, lines_in_fov)
+    print(len(collision_points))
     for collided, point in collision_points:
         if collided:
             pygame.draw.line(sc, RED, cords, point)
@@ -20,7 +24,6 @@ def drawer(sc):
             pygame.draw.line(sc, BLUE, cords, point)
 
 
-angle = 0
 def keys():
     global cords, angle
     v = MOVEMENT_SPEED
