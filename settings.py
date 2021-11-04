@@ -1,0 +1,8 @@
+BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+FPS = 60
+SIZE = (800, 600)
+
+ANGLE_SPEED = 1
+MOVEMENT_SPEED = 2
