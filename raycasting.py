@@ -1,11 +1,9 @@
 import math
-from numba.np.ufunc import parallel
 from numpy import array
 import numba as nb
 import numpy as np
 
 from settings import *
-from generate_random_lines import generate_random_lines
 
 
 @nb.njit(fastmath=True)
@@ -49,17 +47,39 @@ def unit_vector(angle):
     return array([math.cos(angle / 180 * math.pi), math.sin(angle / 180 * math.pi)])
 
 
-def visible_lines(lines, pos, angles):
+def visible_lines(lines, pos, angle, fov):
     _lines = []
-    vec0 = unit_vector(angles[0])
-    vec1 = unit_vector(angles[1])
+    vec0 = unit_vector(angle + 90)
+    # vec1 = unit_vector(angle - fov / 2)
+    # vec2 = unit_vector(angle + fov / 2)
     for line in lines:
-        if (right_or_left(pos, line[0], vec0) >= 0 \
-        and right_or_left(pos, line[0], vec1) < 0) \
-       or (right_or_left(pos, line[1], vec0) >= 0 \
-        and right_or_left(pos, line[1], vec1)) < 0:
+        # # point 1 lies in fov
+        # cond1 = (right_or_left(pos, line[0], vec1) >= 0) and (right_or_left(pos, line[0], vec2) < 0)
+        # # point 2 lies in fov
+        # cond2 = (right_or_left(pos, line[1], vec1) >= 0) and (right_or_left(pos, line[1], vec2) < 0)
+        
+        # one point lies in fov = 180
+        cond3 = (right_or_left(pos, line[0], vec0) < 0) or \
+                (right_or_left(pos, line[1], vec0) < 0)
+    
+        if cond3:
             _lines.append(line)
     return _lines
+
+
+def visible_points(points, pos, angle, fov):
+    result = []
+    vec0 = unit_vector(angle - fov / 2)
+    vec1 = unit_vector(angle + fov / 2)
+    for point in points:
+        if right_or_left(pos, point, vec0) > 0 \
+        and right_or_left(pos, point, vec1) < 0:
+            result.append(point)
+    return result
+
+
+def rotate_vector(vec):
+    return array([vec[1], -vec[0]])
 
 
 @nb.njit

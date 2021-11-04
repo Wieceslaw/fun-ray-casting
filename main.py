@@ -1,34 +1,21 @@
 import pygame
 from settings import *
 from lines import *
+from app import App
 
-class App:
-    def __init__(self, res, fps) -> None:
-        self.res = res
-        self.fps = fps
-        pygame.init()
-        self.screen = pygame.display.set_mode(self.res)
-        self.clock = pygame.time.Clock()
-
+class RayCastApp(App):
     def update(self):
         keys()
 
-    def draw(self): 
+    def draw(self):
         self.screen.fill(BG_COLOR)
         drawer(self.screen)
         pygame.display.flip()
 
-    def run(self):
-        while True:
-            self.update()
-            self.draw()
-            [exit() for i in pygame.event.get() if i.type == pygame.QUIT]
-            self.clock.tick(self.fps)
-            pygame.display.set_caption(f'FPS: {self.clock.get_fps()}')
 
 
 if __name__ == '__main__':
-    app = App(
+    app = RayCastApp(
         SIZE,
         FPS
     )
