@@ -6,3 +6,4 @@ player.py
 ray_casting.py
 __pycache__
 .venv
+test.py
