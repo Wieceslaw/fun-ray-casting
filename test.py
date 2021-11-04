@@ -6,17 +6,16 @@ import numba as nb
 import math
 
 
-@time_test(1000)
 def distance(x1, y1, x2, y2):
     return math.sqrt((x1- x2) ** 2 + (y1 - y2) ** 2)
 
 
-def line(vec1, vec2):
-    vec3 = vec1 - vec2
-    if vec3[0] == 0:
-        vec3[0] = 0.000001
-    k = vec3[1] / vec3[0]
-    b = vec1[1] - vec1[0] * k
+def line(p1, p2):
+    vec = p1 - p2
+    if vec[0] == 0:
+        vec[0] = 0.000001
+    k = vec[1] / vec[0]
+    b = p1[1] - p1[0] * k
     return k, b
 
 
@@ -24,9 +23,15 @@ def intersects(p0, p1, p2, ray_vec):
     x0, y0 = p0
     xr, yr = ray_vec
     k, b = line(p1, p2)
-    t = (k * x0 + b - y0) / (yr - xr * k)
+    temp = (yr - xr * k)
+    if temp == 0: # parallel
+        return
+    t = (k * x0 + b - y0) / temp
     p3 = array((x0 + xr * t, y0 + yr * t))
-    return t >= 0 and distance(*p1, *p3) <= distance(*p1, *p2) and distance(*p2, *p3) <= distance(*p1, *p2)
+    if t >= 0:
+        length = distance(*p1, *p2)
+        if distance(*p1, *p3) <= length and distance(*p2, *p3) <= length:
+            return p3
 
 
 def main():
