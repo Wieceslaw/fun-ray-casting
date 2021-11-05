@@ -1,28 +1,32 @@
 from colors import *
-from numpy import array
 
 # app config
 FPS = 60
-SIZE = (800, 600)
+WIDTH = 600
+HEIGHT = 600
+SIZE = (WIDTH, HEIGHT)
 BG_COLOR = BLACK
 
 # consts
 INFINITY = 10e10
+COEFF = 50
+
+# player config
+START_POS = (0, 0)
+START_ANGLE = 0
+ANGLE_SPEED = 1
+MOVEMENT_SPEED = 2
 
 # object settings
-NLINES = 10
+NLINES = 5
 NPOINTS = 0
 NCIRCLES = 5
 RPOINT = 3
 RCIRCLE = 50
 
+# other
 MAX_LENGTH = (SIZE[0] ** 2 + SIZE[1] ** 2) ** 0.5
-ANGLE_SPEED = 1
-MOVEMENT_SPEED = 2
-FOV = 120
-NRAYS = 120
-
+FOV = 60
+NRAYS = 300
+HALF_HEIGHT = HEIGHT // 2
 DANGLE = FOV / NRAYS
-
-pos = array([400, 300])
-angle = 0
