@@ -8,3 +8,7 @@ def generate_random_lines(n, size):
 
 def generate_random_points(n, size):
     return [array([random() * size[0], random() * size[1]]) for _ in range(n)]
+
+
+def generate_random_circles(n, r, size):
+    return [(array((random() * size[0], random() * size[1])), random() * r) for _ in range(n)]
