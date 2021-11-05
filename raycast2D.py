@@ -39,7 +39,13 @@ class RayCastApp(App):
 
 
 if __name__ == '__main__':
-    player = Player(START_POS, START_ANGLE, MOVEMENT_SPEED, ANGLE_SPEED)
+    player = Player(
+        START_POS, 
+        START_ANGLE, 
+        MOVEMENT_SPEED, 
+        ANGLE_SPEED,
+        strait_control=True
+        )
     app = RayCastApp(
         SIZE,
         FPS

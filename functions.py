@@ -121,16 +121,22 @@ def circle_intersection(pos: array, ray: array, circle: int) -> array:
     x1, y1 = pos + ray
     h, k = p0
     a = (x1 - x0) ** 2 + (y1 - y0) ** 2
-    if a == 0:
-        return
     b = 2 * (x1 - x0) * (x0 - h) + 2 * (y1 - y0) * (y0 - k)
     c = (x0 - h) ** 2 + (y0 - k) ** 2 - r ** 2
+    # no intersection
     if b ** 2 - 4 * a * c < 0:
-        return
+        return 
+    # outside point
     t1 = (-b - math.sqrt(b ** 2 - 4 * a * c)) / (2 * a) 
-    x = x0 + t1 * (x1 - x0)
-    y = y0 + t1 * (y1 - y0)
     if t1 > 0:
+        y = y0 + t1 * (y1 - y0)
+        x = x0 + t1 * (x1 - x0)
+        return array([x, y])
+    # inside point
+    t2 = (-b + math.sqrt(b ** 2 - 4 * a * c)) / (2 * a)
+    if t2 > 0:
+        y = y0 + t2 * (y1 - y0)
+        x = x0 + t2 * (x1 - x0)
         return array([x, y])
 
 
@@ -141,7 +147,7 @@ def circle_raycast(pos: array, angle: int, circles: list):
         ang += DANGLE
         ray = unit_vector(ang)
         min_dist = INFINITY
-        nearest_point = ray * 1000 + pos
+        nearest_point = ray * MAX_LENGTH + pos
         collided = False
         for circle in circles:
             point = circle_intersection(pos, ray, circle)

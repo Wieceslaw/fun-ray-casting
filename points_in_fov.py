@@ -1,7 +1,6 @@
-from numpy import array
 from app import App
 import pygame
-from raycasting import *
+from functions import *
 from colors import *
 from generate_random import *
 
