@@ -1,6 +1,6 @@
 import pygame
 
-from settings import *
+from settings2D import *
 from objects import *
 from functions import *
 
@@ -8,7 +8,7 @@ from app import App
 from player import Player
 
 
-class RayCastApp(App):
+class RayCast2DApp(App):
     def update(self):
         player.update()
 
@@ -27,11 +27,9 @@ class RayCastApp(App):
         angle = player.angle
         if lines or circles:
             collision_points += raycast(pos, angle, FOV, NRAYS, lines, circles)
-        for collided, point in collision_points:
-            if collided:
-                pygame.draw.line(self.screen, RED, pos, point)
-            else:
-                pygame.draw.line(self.screen, BLUE, pos, point)
+        for point in collision_points:
+            pygame.draw.line(self.screen, RED, pos, point)
+
         # drawing player
         pygame.draw.circle(self.screen, WHITE, pos, 12)
         pygame.display.flip()
@@ -46,7 +44,7 @@ if __name__ == '__main__':
         ANGLE_SPEED,
         strait_control=True
         )
-    app = RayCastApp(
+    app = RayCast2DApp(
         SIZE,
         FPS
     )

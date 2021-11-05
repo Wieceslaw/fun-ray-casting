@@ -3,11 +3,9 @@ import numpy as np
 import numba as nb
 from numpy import array
 
-from settings import *
-
 
 @nb.njit(fastmath=True)
-def distance(p1, p2):
+def distance(p1: array, p2: array) -> array:
     return np.sqrt((p1[0]- p2[0]) ** 2 + (p1[1]- p2[1]) ** 2)
 
 
@@ -17,8 +15,29 @@ def right_or_left(p0, p1, vec0):
 
 
 @nb.njit(fastmath=True)
-def unit_vector(angle):
+def unit_vector(angle: int) -> array:
     return array([math.cos(angle / 180 * math.pi), math.sin(angle / 180 * math.pi)])
+
+
+def rotate_vector(vec: array) -> array:
+    return array([vec[1], -vec[0]])
+
+
+def lines_to_points(lines: list [array, array]) -> list [array]:
+    points = []
+    for line in lines:
+        for point in line:
+            points.append(point)
+    return points
+
+
+def prove_circle_intersection(pos, ray, circle):
+    p0, r = circle
+    vec0 = p0 - pos
+    vec1 = (np.dot(vec0, ray) / np.dot(ray, ray)) * ray
+    p1 = pos + vec1
+    if distance(p0, p1) <= r:
+        return True
 
 
 def visible_lines(lines, pos, angle, fov):
@@ -52,38 +71,32 @@ def visible_points(points, pos, angle, fov):
     return result
 
 
-def rotate_vector(vec):
-    return array([vec[1], -vec[0]])
-
-
 @nb.njit
-def line_raycast(ray_point: array, angle: int, lines: list):
+def line_raycast(ray_point, angle, lines, fov, nrays, dangle, max_length):
     points = []
-    ang = angle - FOV // 2
-    for _ in range(NRAYS):
-        ang += DANGLE
+    ang = angle - fov // 2
+    for _ in range(nrays):
+        ang += dangle
         vec = unit_vector(ang)
-        min_dist = INFINITY
-        nearest_point = vec * MAX_LENGTH + ray_point
-        collided = False
+        min_dist = 10e10
+        nearest_point = vec * max_length + ray_point
         for line in lines:
             point = line_intersection(ray_point, vec, line)
             if point is not None:
-                collided = True
                 new_dist = distance(ray_point, point)
                 if new_dist < min_dist:
                     min_dist = new_dist
                     nearest_point = point
-        points.append((collided, nearest_point))
+        points.append(nearest_point)
     return points
 
 
 @nb.njit
-def line_intersection(p0, ray, line):
+def line_intersection(pos: array, ray: array, line: list [array]):
     x1, y1 = line[0]
     x2, y2 = line[1]
-    x3, y3 = p0
-    x4, y4 = p0 + ray
+    x3, y3 = pos
+    x4, y4 = pos + ray
     den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
     if den == 0:
         return
@@ -96,23 +109,6 @@ def line_intersection(p0, ray, line):
     x = x1 + t * (x2 - x1)
     y = y1 + t * (y2 - y1)
     return array([x, y])
-
-
-def lines_to_points(lines):
-    points = []
-    for line in lines:
-        for point in line:
-            points.append(point)
-    return points
-
-
-def prove_circle_intersection(pos, ray, circle):
-    p0, r = circle
-    vec0 = p0 - pos
-    vec1 = (np.dot(vec0, ray) / np.dot(ray, ray)) * ray
-    p1 = pos + vec1
-    if distance(p0, p1) <= r:
-        return True
 
 
 def circle_intersection(pos: array, ray: array, circle: int) -> array:
@@ -140,24 +136,22 @@ def circle_intersection(pos: array, ray: array, circle: int) -> array:
         return array([x, y])
 
 
-def circle_raycast(pos: array, angle: int, circles: list):
+def circle_raycast(pos: array, angle: int, circles: list, fov, nrays, dangle, max_length):
     points = []
-    ang = angle - FOV // 2
-    for _ in range(NRAYS):
-        ang += DANGLE
+    ang = angle - fov // 2
+    for _ in range(nrays):
+        ang += dangle
         ray = unit_vector(ang)
-        min_dist = INFINITY
-        nearest_point = ray * MAX_LENGTH + pos
-        collided = False
+        min_dist = 10e10
+        nearest_point = ray * max_length + pos
         for circle in circles:
             point = circle_intersection(pos, ray, circle)
             if point is not None:
-                collided = True
                 new_dist = distance(pos, point)
                 if new_dist < min_dist:
                     min_dist = new_dist
                     nearest_point = point
-        points.append((collided, nearest_point))
+        points.append(nearest_point)
     return points
 
 
@@ -168,13 +162,11 @@ def raycast(pos, angle, fov, nrays, lines=[], circles=[]):
     for _ in range(nrays):
         ang += dangle
         ray = unit_vector(ang)
-        min_dist = INFINITY
+        min_dist = 10e10
         nearest_point = ray * 1000 + pos
-        collided = False
         for circle in circles:
             point = circle_intersection(pos, ray, circle)
             if point is not None:
-                collided = True
                 new_dist = distance(pos, point)
                 if new_dist < min_dist:
                     min_dist = new_dist
@@ -182,25 +174,16 @@ def raycast(pos, angle, fov, nrays, lines=[], circles=[]):
         for line in lines:
             point = line_intersection(pos, ray, line)
             if point is not None:
-                collided = True
                 new_dist = distance(pos, point)
                 if new_dist < min_dist:
                     min_dist = new_dist
                     nearest_point = point
-        points.append((collided, nearest_point))
+        points.append(nearest_point)
     return points
 
 
 def main():
-    lines = [((0,1), (0,2)), ((0,3), (0,4))]
-
-    # visible_lines(lines, 1, 1)
-    p0 = array([1, 0])
-    pos = array([0, 0])
-    vec = array([1, 1])
-    # print(right_or_left(pos, p0, vec))
-    angle = 90
-    print(visible_lines(lines, pos, (angle - NRAYS // 2, angle + NRAYS // 2)))
+    pass
 
 
 if __name__ == '__main__':

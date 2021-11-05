@@ -9,7 +9,7 @@ BG_COLOR = BLACK
 
 # consts
 INFINITY = 10e10
-COEFF = 50
+COEFF = 50 # 3d
 
 # player config
 START_POS = (0, 0)
@@ -28,5 +28,7 @@ RCIRCLE = 50
 MAX_LENGTH = (SIZE[0] ** 2 + SIZE[1] ** 2) ** 0.5
 FOV = 60
 NRAYS = 120
-HALF_HEIGHT = HEIGHT // 2
 DANGLE = FOV / NRAYS
+HALF_HEIGHT = HEIGHT // 2 # 3d
+K = WIDTH // NRAYS # 3d
+WALLS_COLOR = RED # 3d
