@@ -1,7 +1,7 @@
 import math
-from numpy import array
-import numba as nb
 import numpy as np
+import numba as nb
+from numpy import array
 
 from settings import *
 
@@ -9,32 +9,6 @@ from settings import *
 @nb.njit(fastmath=True)
 def distance(p1, p2):
     return np.sqrt((p1[0]- p2[0]) ** 2 + (p1[1]- p2[1]) ** 2)
-
-
-@nb.njit(parallel=True)
-def line(p1, p2):
-    vec = p1 - p2
-    if vec[0] == 0:
-        vec[0] = 10e-10
-    k = vec[1] / vec[0]
-    b = p1[1] - p1[0] * k
-    return k, b
-
-
-@nb.njit
-def intersection(p0, p1, p2, ray_vec):
-    x0, y0 = p0
-    xr, yr = ray_vec
-    k, b = line(p1, p2)
-    temp = (yr - xr * k)
-    if temp == 0:
-        return
-    t = (k * x0 + b - y0) / temp
-    p3 = array((x0 + xr * t, y0 + yr * t))
-    if t >= 0:
-        length = distance(p1, p2)
-        if distance(p1, p3) <= length and distance(p2, p3) <= length:
-            return p3
 
 
 def right_or_left(p0, p1, vec0):
@@ -85,13 +59,15 @@ def rotate_vector(vec):
 @nb.njit
 def raycast(ray_point: array, angle: int, lines: list):
     points = []
-    for ang in range(angle - FOV // 2, angle + FOV // 2, FOV // NRAYS):
+    ang = angle - FOV // 2
+    for _ in range(NRAYS):
+        ang += DANGLE
         vec = unit_vector(ang)
         min_dist = INFINITY
         nearest_point = vec * MAX_LENGTH + ray_point
         collided = False
         for line in lines:
-            point = intersection(ray_point, *line, vec)
+            point = intersection(ray_point, vec, *line)
             if point is not None:
                 collided = True
                 new_dist = distance(ray_point, point)
@@ -99,6 +75,34 @@ def raycast(ray_point: array, angle: int, lines: list):
                     min_dist = new_dist
                     nearest_point = point
         points.append((collided, nearest_point))
+    return points
+
+
+@nb.njit
+def intersection(p0, ray, p1, p2):
+    x1, y1 = p1
+    x2, y2 = p2
+    x3, y3 = p0
+    x4, y4 = p0 + ray
+    den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+    if den == 0:
+        return
+    t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den
+    if t > 1 or t < 0:
+        return
+    u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den
+    if u < 0:
+        return
+    x = x1 + t * (x2 - x1)
+    y = y1 + t * (y2 - y1)
+    return array([x, y])
+
+
+def lines_to_points(lines):
+    points = []
+    for line in lines:
+        for point in line:
+            points.append(point)
     return points
 
 
@@ -112,6 +116,7 @@ def main():
     # print(right_or_left(pos, p0, vec))
     angle = 90
     print(visible_lines(lines, pos, (angle - NRAYS // 2, angle + NRAYS // 2)))
+
 
 if __name__ == '__main__':
     main()

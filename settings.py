@@ -9,8 +9,8 @@ MAX_LENGTH = (SIZE[0] ** 2 + SIZE[1] ** 2) ** 0.5
 ANGLE_SPEED = 1
 MOVEMENT_SPEED = 2
 INFINITY = 10e10
-FOV = 120
+FOV = 360
+NRAYS = 720
 
-NRAYS = 120 # must be multiple to FOV
-
+DANGLE = FOV / NRAYS
 NLINES = 20

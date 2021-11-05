@@ -19,7 +19,7 @@ class TestApp(App):
 
 def drawer(screen):
     pygame.draw.circle(screen, GREEN, pos, 12)
-    points_in_fov = visible_points(points, pos, (angle - fov // 2, angle + fov // 2))
+    points_in_fov = visible_points(points, pos, angle, fov)
     left_edge = angle - fov // 2
     right_edge = angle + fov // 2
     pygame.draw.line(screen, GREEN, pos, pos + unit_vector(left_edge) * 1000)
